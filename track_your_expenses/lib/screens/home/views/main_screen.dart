@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:track_your_expenses/data/dart.dart';
 
 class MainScreen extends StatelessWidget {
   const MainScreen({super.key});
@@ -16,6 +17,7 @@ class MainScreen extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 20),
         child: Column(
           children: [
+            // For the welcome and settings icon
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -38,7 +40,7 @@ class MainScreen extends StatelessWidget {
                         ),
                       ],
                     ),
-                    SizedBox(width: 20),
+                    const SizedBox(width: 20),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -64,12 +66,14 @@ class MainScreen extends StatelessWidget {
                 ),
                 IconButton(
                   onPressed: () {},
-                  icon: Icon(
+                  icon: const Icon(
                     CupertinoIcons.settings,
                   ),
                 ),
               ],
             ),
+
+            // For the credit card
             Container(
               width: double.infinity,
               height: height * 0.2,
@@ -81,20 +85,20 @@ class MainScreen extends StatelessWidget {
                     Theme.of(context).colorScheme.secondary,
                     Theme.of(context).colorScheme.tertiary,
                   ],
-                  transform: GradientRotation(pi / 4),
+                  transform: const GradientRotation(pi / 4),
                 ),
                 boxShadow: [
                   BoxShadow(
                     blurRadius: 2,
                     color: Colors.black.withOpacity(0.2),
-                    offset: Offset(5, 5),
+                    offset: const Offset(5, 5),
                   ),
                 ],
               ),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text(
+                  const Text(
                     'Total balance',
                     style: TextStyle(
                       fontSize: 16,
@@ -102,7 +106,7 @@ class MainScreen extends StatelessWidget {
                       fontWeight: FontWeight.w600,
                     ),
                   ),
-                  Text(
+                  const Text(
                     'RM 1,000.00',
                     style: TextStyle(
                       fontSize: 30,
@@ -116,15 +120,15 @@ class MainScreen extends StatelessWidget {
                       Row(
                         children: [
                           Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 10),
+                            padding: const EdgeInsets.symmetric(horizontal: 10),
                             child: Container(
                               width: width * 0.08,
                               height: height * 0.09,
-                              decoration: BoxDecoration(
+                              decoration: const BoxDecoration(
                                 color: Colors.white38,
                                 shape: BoxShape.circle,
                               ),
-                              child: Center(
+                              child: const Center(
                                 child: Icon(
                                   CupertinoIcons.arrow_down,
                                   size: 12,
@@ -133,7 +137,7 @@ class MainScreen extends StatelessWidget {
                               ),
                             ),
                           ),
-                          Column(
+                          const Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
@@ -157,19 +161,20 @@ class MainScreen extends StatelessWidget {
                         ],
                       ),
                       Padding(
-                        padding: EdgeInsets.only(right: 15),
+                        padding: const EdgeInsets.only(right: 15),
                         child: Row(
                           children: [
                             Padding(
-                              padding: EdgeInsets.symmetric(horizontal: 10),
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 10),
                               child: Container(
                                 width: width * 0.08,
                                 height: height * 0.09,
-                                decoration: BoxDecoration(
+                                decoration: const BoxDecoration(
                                   color: Colors.white38,
                                   shape: BoxShape.circle,
                                 ),
-                                child: Center(
+                                child: const Center(
                                   child: Icon(
                                     CupertinoIcons.arrow_down,
                                     size: 12,
@@ -178,7 +183,7 @@ class MainScreen extends StatelessWidget {
                                 ),
                               ),
                             ),
-                            Column(
+                            const Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
@@ -207,7 +212,10 @@ class MainScreen extends StatelessWidget {
                 ],
               ),
             ),
-            SizedBox(height: 20),
+
+            const SizedBox(height: 20),
+
+            // For the transactions and view all texts
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -232,13 +240,16 @@ class MainScreen extends StatelessWidget {
                 ),
               ],
             ),
-            SizedBox(height: 20),
+
+            const SizedBox(height: 20),
+
+            // For the list of transactions
             Expanded(
               child: ListView.builder(
-                itemCount: 5,
+                itemCount: myTransactionsData.length,
                 itemBuilder: (context, index) {
                   return Container(
-                    margin: EdgeInsets.only(bottom: 10),
+                    margin: const EdgeInsets.only(bottom: 10),
                     decoration: BoxDecoration(
                       color: Colors.grey.shade200,
                       borderRadius: BorderRadius.circular(12),
@@ -257,20 +268,17 @@ class MainScreen extends StatelessWidget {
                                     width: width * 0.15,
                                     height: height * 0.1,
                                     decoration: BoxDecoration(
-                                      color: Colors.yellow,
+                                      color: myTransactionsData[index]['color'],
                                       shape: BoxShape.circle,
                                     ),
                                   ),
                                 ),
-                                Icon(
-                                  Icons.food_bank,
-                                  color: Colors.white,
-                                ),
+                                myTransactionsData[index]['icon'],
                               ],
                             ),
-                            SizedBox(width: 10),
+                            const SizedBox(width: 10),
                             Text(
-                              'Food',
+                              myTransactionsData[index]['name'],
                               style: TextStyle(
                                 fontSize: 16,
                                 color:
@@ -281,11 +289,12 @@ class MainScreen extends StatelessWidget {
                           ],
                         ),
                         Padding(
-                          padding: EdgeInsets.only(right: 10),
+                          padding: const EdgeInsets.only(right: 10),
                           child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.end,
                             children: [
                               Text(
-                                '- RM45.00',
+                                myTransactionsData[index]['totalAmount'],
                                 style: TextStyle(
                                   fontSize: 14,
                                   color: Theme.of(context)
@@ -295,7 +304,7 @@ class MainScreen extends StatelessWidget {
                                 ),
                               ),
                               Text(
-                                'Today',
+                                myTransactionsData[index]['date'],
                                 style: TextStyle(
                                   fontSize: 14,
                                   color: Theme.of(context)
