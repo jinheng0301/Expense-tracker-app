@@ -15,6 +15,18 @@ class _AddExpenseState extends State<AddExpense> {
   TextEditingController dateController = TextEditingController();
   DateTime selectDate = DateTime.now();
 
+  List<String> categoriesIcon = [
+    'entertainment',
+    'food',
+    'home',
+    'pet',
+    'shopping',
+    'tech',
+    'travel',
+  ];
+
+  String iconSelected = '';
+
   @override
   void initState() {
     // TODO: implement initState
@@ -84,43 +96,133 @@ class _AddExpenseState extends State<AddExpense> {
                         showDialog(
                           context: context,
                           builder: (ctx) {
-                            return AlertDialog(
-                              title: Text('Create a Category'),
-                              content: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  TextFormField(
-                                    decoration: InputDecoration(
-                                      hintText: 'Name',
-                                      fillColor: Colors.grey.shade300,
-                                      border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(20),
+                            bool isExpanded = false;
+
+                            return StatefulBuilder(
+                                builder: (context, setState) {
+                              return AlertDialog(
+                                title: Text('Create a Category'),
+                                content: SizedBox(
+                                  width: width * 0.8,
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      TextFormField(
+                                        decoration: InputDecoration(
+                                          isDense: true,
+                                          filled: true,
+                                          hintText: 'Name',
+                                          fillColor: Colors.grey.shade300,
+                                          border: OutlineInputBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(20),
+                                          ),
+                                        ),
                                       ),
-                                    ),
-                                  ),
-                                  SizedBox(height: 20),
-                                  TextFormField(
-                                    decoration: InputDecoration(
-                                      hintText: 'Icon',
-                                      fillColor: Colors.grey.shade300,
-                                      border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(20),
+                                      SizedBox(height: 20),
+                                      TextFormField(
+                                        onTap: () {
+                                          setState(() {
+                                            isExpanded = !isExpanded;
+                                          });
+                                        },
+                                        readOnly: true,
+                                        decoration: InputDecoration(
+                                          isDense: true,
+                                          filled: true,
+                                          hintText: 'Icon',
+                                          fillColor: Colors.grey.shade300,
+                                          suffixIcon: IconButton(
+                                            onPressed: () {},
+                                            icon: Icon(
+                                              size: 20,
+                                              FontAwesomeIcons.caretDown,
+                                              color: Colors.black,
+                                            ),
+                                          ),
+                                          border: OutlineInputBorder(
+                                            borderRadius: BorderRadius.only(
+                                              topLeft: Radius.circular(20),
+                                              topRight: Radius.circular(20),
+                                            ),
+                                          ),
+                                        ),
                                       ),
-                                    ),
-                                  ),
-                                  SizedBox(height: 20),
-                                  TextFormField(
-                                    decoration: InputDecoration(
-                                      hintText: 'Color',
-                                      fillColor: Colors.grey.shade300,
-                                      border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(20),
+                                      isExpanded
+                                          ? Container(
+                                              width: width,
+                                              height: 200,
+                                              decoration: BoxDecoration(
+                                                border: Border.all(
+                                                  color: Colors.grey.shade300,
+                                                ),
+                                                borderRadius: BorderRadius.only(
+                                                  bottomLeft:
+                                                      Radius.circular(20),
+                                                  bottomRight:
+                                                      Radius.circular(20),
+                                                ),
+                                              ),
+                                              child: GridView.builder(
+                                                gridDelegate:
+                                                    SliverGridDelegateWithFixedCrossAxisCount(
+                                                  crossAxisCount: 3,
+                                                  mainAxisSpacing: 5,
+                                                  crossAxisSpacing: 5,
+                                                ),
+                                                itemCount:
+                                                    categoriesIcon.length,
+                                                itemBuilder: (context, index) {
+                                                  return GestureDetector(
+                                                    onTap: () {
+                                                      setState(() {
+                                                        iconSelected =
+                                                            categoriesIcon[index];
+                                                      });
+                                                    },
+                                                    child: Container(
+                                                      width: 50,
+                                                      height: 50,
+                                                      decoration: BoxDecoration(
+                                                        color: iconSelected ==
+                                                                categoriesIcon[index]
+                                                            ? Colors.blue
+                                                            : Colors.white,
+                                                        border: Border.all(
+                                                          width: 5,
+                                                          color: Colors
+                                                              .grey.shade300,
+                                                        ),
+                                                        image: DecorationImage(
+                                                          image: AssetImage(
+                                                            'assets/${categoriesIcon[index]}.png',
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  );
+                                                },
+                                              ),
+                                            )
+                                          : Container(),
+                                      SizedBox(height: 20),
+                                      TextFormField(
+                                        decoration: InputDecoration(
+                                          isDense: true,
+                                          filled: true,
+                                          hintText: 'Color',
+                                          fillColor: Colors.grey.shade300,
+                                          border: OutlineInputBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(20),
+                                          ),
+                                        ),
                                       ),
-                                    ),
+                                    ],
                                   ),
-                                ],
-                              ),
-                            );
+                                ),
+                              );
+                            });
                           },
                         );
                       },
