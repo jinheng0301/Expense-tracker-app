@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
 
@@ -26,6 +27,7 @@ class _AddExpenseState extends State<AddExpense> {
   ];
 
   String iconSelected = '';
+  late Color categoryColor;
 
   @override
   void initState() {
@@ -34,10 +36,220 @@ class _AddExpenseState extends State<AddExpense> {
     super.initState();
   }
 
+  IconButton iconCategory(BuildContext context, double width, double height) {
+    return IconButton(
+      onPressed: () {
+        showDialog(
+          context: context,
+          builder: (ctx) {
+            bool isExpanded = false;
+
+            return StatefulBuilder(builder: (context, setState) {
+              return AlertDialog(
+                title: Text('Create a Category'),
+                content: SizedBox(
+                  width: width * 0.8,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      TextFormField(
+                        decoration: InputDecoration(
+                          isDense: true,
+                          filled: true,
+                          hintText: 'Name',
+                          fillColor: Colors.grey.shade300,
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 20),
+                      TextFormField(
+                        onTap: () {
+                          setState(() {
+                            isExpanded = !isExpanded;
+                          });
+                        },
+                        readOnly: true,
+                        decoration: InputDecoration(
+                          isDense: true,
+                          filled: true,
+                          hintText: 'Icon',
+                          fillColor: Colors.grey.shade300,
+                          suffixIcon: IconButton(
+                            onPressed: () {},
+                            icon: Icon(
+                              size: 20,
+                              FontAwesomeIcons.caretDown,
+                              color: Colors.black,
+                            ),
+                          ),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(20),
+                              topRight: Radius.circular(20),
+                            ),
+                          ),
+                        ),
+                      ),
+                      isExpanded ? iconContainer(width, setState) : Container(),
+                      SizedBox(height: 20),
+                      TextFormField(
+                        onTap: () {
+                          colorPickerDialog(context, height);
+                        },
+                        readOnly: true,
+                        decoration: InputDecoration(
+                          isDense: true,
+                          filled: true,
+                          hintText: 'Color',
+                          fillColor: categoryColor,
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 20),
+                      SizedBox(
+                        width: double.infinity,
+                        height: height * 0.05,
+                        child: TextButton(
+                          onPressed: () {
+                            print(categoryColor);
+                            Navigator.of(context).pop();
+                          },
+                          style: TextButton.styleFrom(
+                            backgroundColor: Colors.black,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(30),
+                            ),
+                          ),
+                          child: Text(
+                            'Save',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 20,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            });
+          },
+        );
+      },
+      icon: Icon(
+        size: 20,
+        FontAwesomeIcons.caretDown,
+        color: Colors.black,
+      ),
+    );
+  }
+
+  Container iconContainer(double width, StateSetter setState) {
+    return Container(
+      width: width,
+      height: 200,
+      decoration: BoxDecoration(
+        border: Border.all(
+          color: Colors.grey.shade300,
+        ),
+        borderRadius: BorderRadius.only(
+          bottomLeft: Radius.circular(20),
+          bottomRight: Radius.circular(20),
+        ),
+      ),
+      child: GridView.builder(
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 3,
+          mainAxisSpacing: 5,
+          crossAxisSpacing: 5,
+        ),
+        itemCount: categoriesIcon.length,
+        itemBuilder: (context, index) {
+          return GestureDetector(
+            onTap: () {
+              setState(
+                () {
+                  iconSelected = categoriesIcon[index];
+                },
+              );
+            },
+            child: Container(
+              width: 50,
+              height: 50,
+              decoration: BoxDecoration(
+                color: iconSelected == categoriesIcon[index]
+                    ? Colors.blue
+                    : Colors.white,
+                border: Border.all(
+                  width: 5,
+                  color: Colors.grey.shade300,
+                ),
+                image: DecorationImage(
+                  image: AssetImage(
+                    'assets/${categoriesIcon[index]}.png',
+                  ),
+                ),
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  Future<dynamic> colorPickerDialog(BuildContext context, double height) {
+    return showDialog(
+      context: context,
+      builder: (ctx) {
+        return AlertDialog(
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ColorPicker(
+                pickerColor: Colors.blue,
+                onColorChanged: (value) {
+                  categoryColor = value;
+                },
+              ),
+              SizedBox(
+                width: double.infinity,
+                height: height * 0.05,
+                child: TextButton(
+                  onPressed: () {
+                    print(categoryColor);
+                    Navigator.of(context).pop();
+                  },
+                  style: TextButton.styleFrom(
+                    backgroundColor: Colors.black,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                  ),
+                  child: Text(
+                    'Save',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 20,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
-    // final height = MediaQuery.of(context).size.height;
+    final height = MediaQuery.of(context).size.height;
 
     return GestureDetector(
       onTap: () {
@@ -91,147 +303,7 @@ class _AddExpenseState extends State<AddExpense> {
                       FontAwesomeIcons.list,
                       color: Colors.black,
                     ),
-                    suffixIcon: IconButton(
-                      onPressed: () {
-                        showDialog(
-                          context: context,
-                          builder: (ctx) {
-                            bool isExpanded = false;
-
-                            return StatefulBuilder(
-                                builder: (context, setState) {
-                              return AlertDialog(
-                                title: Text('Create a Category'),
-                                content: SizedBox(
-                                  width: width * 0.8,
-                                  child: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      TextFormField(
-                                        decoration: InputDecoration(
-                                          isDense: true,
-                                          filled: true,
-                                          hintText: 'Name',
-                                          fillColor: Colors.grey.shade300,
-                                          border: OutlineInputBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(20),
-                                          ),
-                                        ),
-                                      ),
-                                      SizedBox(height: 20),
-                                      TextFormField(
-                                        onTap: () {
-                                          setState(() {
-                                            isExpanded = !isExpanded;
-                                          });
-                                        },
-                                        readOnly: true,
-                                        decoration: InputDecoration(
-                                          isDense: true,
-                                          filled: true,
-                                          hintText: 'Icon',
-                                          fillColor: Colors.grey.shade300,
-                                          suffixIcon: IconButton(
-                                            onPressed: () {},
-                                            icon: Icon(
-                                              size: 20,
-                                              FontAwesomeIcons.caretDown,
-                                              color: Colors.black,
-                                            ),
-                                          ),
-                                          border: OutlineInputBorder(
-                                            borderRadius: BorderRadius.only(
-                                              topLeft: Radius.circular(20),
-                                              topRight: Radius.circular(20),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                      isExpanded
-                                          ? Container(
-                                              width: width,
-                                              height: 200,
-                                              decoration: BoxDecoration(
-                                                border: Border.all(
-                                                  color: Colors.grey.shade300,
-                                                ),
-                                                borderRadius: BorderRadius.only(
-                                                  bottomLeft:
-                                                      Radius.circular(20),
-                                                  bottomRight:
-                                                      Radius.circular(20),
-                                                ),
-                                              ),
-                                              child: GridView.builder(
-                                                gridDelegate:
-                                                    SliverGridDelegateWithFixedCrossAxisCount(
-                                                  crossAxisCount: 3,
-                                                  mainAxisSpacing: 5,
-                                                  crossAxisSpacing: 5,
-                                                ),
-                                                itemCount:
-                                                    categoriesIcon.length,
-                                                itemBuilder: (context, index) {
-                                                  return GestureDetector(
-                                                    onTap: () {
-                                                      setState(() {
-                                                        iconSelected =
-                                                            categoriesIcon[index];
-                                                      });
-                                                    },
-                                                    child: Container(
-                                                      width: 50,
-                                                      height: 50,
-                                                      decoration: BoxDecoration(
-                                                        color: iconSelected ==
-                                                                categoriesIcon[index]
-                                                            ? Colors.blue
-                                                            : Colors.white,
-                                                        border: Border.all(
-                                                          width: 5,
-                                                          color: Colors
-                                                              .grey.shade300,
-                                                        ),
-                                                        image: DecorationImage(
-                                                          image: AssetImage(
-                                                            'assets/${categoriesIcon[index]}.png',
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  );
-                                                },
-                                              ),
-                                            )
-                                          : Container(),
-                                      SizedBox(height: 20),
-                                      TextFormField(
-                                        decoration: InputDecoration(
-                                          isDense: true,
-                                          filled: true,
-                                          hintText: 'Color',
-                                          fillColor: Colors.grey.shade300,
-                                          border: OutlineInputBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(20),
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              );
-                            });
-                          },
-                        );
-                      },
-                      icon: Icon(
-                        size: 20,
-                        FontAwesomeIcons.caretDown,
-                        color: Colors.black,
-                      ),
-                    ),
+                    suffixIcon: iconCategory(context, width, height),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(20),
                     ),
