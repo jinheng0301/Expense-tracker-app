@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
+import 'package:track_your_expenses/screens/add_expense/blocs/create_category_bloc/create_category_bloc.dart';
+import 'package:track_your_expenses/src/models/categories.dart';
+import 'package:uuid/uuid.dart';
 
 class AddExpense extends StatefulWidget {
   const AddExpense({super.key});
@@ -26,8 +30,8 @@ class _AddExpenseState extends State<AddExpense> {
     'travel',
   ];
 
+  late Color categoryColor = Colors.white;
   String iconSelected = '';
-  late Color categoryColor;
 
   @override
   void initState() {
@@ -42,6 +46,12 @@ class _AddExpenseState extends State<AddExpense> {
         showDialog(
           context: context,
           builder: (ctx) {
+            TextEditingController categoryNameController =
+                TextEditingController();
+            TextEditingController categoryIconController =
+                TextEditingController();
+            TextEditingController categoryColorController =
+                TextEditingController();
             bool isExpanded = false;
 
             return StatefulBuilder(builder: (context, setState) {
@@ -53,6 +63,7 @@ class _AddExpenseState extends State<AddExpense> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       TextFormField(
+                        controller: categoryNameController,
                         decoration: InputDecoration(
                           isDense: true,
                           filled: true,
@@ -65,6 +76,7 @@ class _AddExpenseState extends State<AddExpense> {
                       ),
                       SizedBox(height: 20),
                       TextFormField(
+                        controller: categoryIconController,
                         onTap: () {
                           setState(() {
                             isExpanded = !isExpanded;
@@ -95,6 +107,7 @@ class _AddExpenseState extends State<AddExpense> {
                       isExpanded ? iconContainer(width, setState) : Container(),
                       SizedBox(height: 20),
                       TextFormField(
+                        controller: categoryColorController,
                         onTap: () {
                           colorPickerDialog(context, height);
                         },
@@ -116,6 +129,18 @@ class _AddExpenseState extends State<AddExpense> {
                         child: TextButton(
                           onPressed: () {
                             print(categoryColor);
+                            // create category object and pop
+                            Category category = Category(
+                              categoryId: Uuid().v1(),
+                              name: categoryNameController.text,
+                              totalExpenses:
+                                  0, // Assuming initial totalExpenses is 0
+                              icon: iconSelected,
+                              color: categoryColor.toString(),
+                            );
+                            context.read<CreateCategoryBloc>().add(
+                                  CreateCategory(category as String),
+                                );
                             Navigator.of(context).pop();
                           },
                           style: TextButton.styleFrom(
@@ -206,40 +231,43 @@ class _AddExpenseState extends State<AddExpense> {
     return showDialog(
       context: context,
       builder: (ctx) {
-        return AlertDialog(
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              ColorPicker(
-                pickerColor: Colors.blue,
-                onColorChanged: (value) {
-                  categoryColor = value;
-                },
-              ),
-              SizedBox(
-                width: double.infinity,
-                height: height * 0.05,
-                child: TextButton(
-                  onPressed: () {
-                    print(categoryColor);
-                    Navigator.of(context).pop();
+        return BlocProvider.value(
+          value: context.read<CreateCategoryBloc>(),
+          child: AlertDialog(
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ColorPicker(
+                  pickerColor: Colors.blue,
+                  onColorChanged: (value) {
+                    categoryColor = value;
                   },
-                  style: TextButton.styleFrom(
-                    backgroundColor: Colors.black,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30),
+                ),
+                SizedBox(
+                  width: double.infinity,
+                  height: height * 0.05,
+                  child: TextButton(
+                    onPressed: () {
+                      print(categoryColor);
+                      Navigator.of(context).pop();
+                    },
+                    style: TextButton.styleFrom(
+                      backgroundColor: Colors.black,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30),
+                      ),
                     ),
-                  ),
-                  child: Text(
-                    'Save',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 20,
+                    child: Text(
+                      'Save',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 20,
+                      ),
                     ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         );
       },

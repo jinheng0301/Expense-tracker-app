@@ -2,6 +2,9 @@ import 'dart:math';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:track_your_expenses/expense_repository.dart';
+import 'package:track_your_expenses/screens/add_expense/blocs/create_category_bloc/create_category_bloc.dart';
 import 'package:track_your_expenses/screens/add_expense/views/add_expense.dart';
 import 'package:track_your_expenses/screens/home/views/main_screen.dart';
 import 'package:track_your_expenses/screens/home/views/stat_screen.dart';
@@ -92,7 +95,12 @@ class _HomeScreenState extends State<HomeScreen> {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => AddExpense(),
+              builder: (context) => BlocProvider(
+                create: (context) => CreateCategoryBloc(
+                  FirebaseExpenseRepo(),
+                ),
+                child: AddExpense(),
+              ),
             ),
           );
         },
