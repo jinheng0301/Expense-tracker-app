@@ -53,116 +53,139 @@ class _AddExpenseState extends State<AddExpense> {
             TextEditingController categoryColorController =
                 TextEditingController();
             bool isExpanded = false;
+            bool isLoading = false;
 
-            return StatefulBuilder(builder: (context, setState) {
-              return AlertDialog(
-                title: Text('Create a Category'),
-                content: SizedBox(
-                  width: width * 0.8,
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      TextFormField(
-                        controller: categoryNameController,
-                        decoration: InputDecoration(
-                          isDense: true,
-                          filled: true,
-                          hintText: 'Name',
-                          fillColor: Colors.grey.shade300,
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(20),
-                          ),
+            return BlocProvider.value(
+              value: context.read<CreateCategoryBloc>(),
+              child: BlocListener<CreateCategoryBloc, CreateCategoryState>(
+                listener: (context, state) {
+                  // TODO: implement listener
+                  if (state is CreateCategorySuccess) {
+                    Navigator.of(context).pop();
+                  } else if (state is CreateCategoryLoading) {
+                    setState(() {
+                      isLoading = true;
+                    });
+                  }
+                },
+                child: StatefulBuilder(
+                  builder: (context, setState) {
+                    return AlertDialog(
+                      title: Text('Create a Category'),
+                      content: SizedBox(
+                        width: width * 0.8,
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            TextFormField(
+                              controller: categoryNameController,
+                              decoration: InputDecoration(
+                                isDense: true,
+                                filled: true,
+                                hintText: 'Name',
+                                fillColor: Colors.grey.shade300,
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                              ),
+                            ),
+                            SizedBox(height: 20),
+                            TextFormField(
+                              controller: categoryIconController,
+                              onTap: () {
+                                setState(() {
+                                  isExpanded = !isExpanded;
+                                });
+                              },
+                              readOnly: true,
+                              decoration: InputDecoration(
+                                isDense: true,
+                                filled: true,
+                                hintText: 'Icon',
+                                fillColor: Colors.grey.shade300,
+                                suffixIcon: IconButton(
+                                  onPressed: () {},
+                                  icon: Icon(
+                                    size: 20,
+                                    FontAwesomeIcons.caretDown,
+                                    color: Colors.black,
+                                  ),
+                                ),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.only(
+                                    topLeft: Radius.circular(20),
+                                    topRight: Radius.circular(20),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            isExpanded
+                                ? iconContainer(width, setState)
+                                : Container(),
+                            SizedBox(height: 20),
+                            TextFormField(
+                              controller: categoryColorController,
+                              onTap: () {
+                                colorPickerDialog(context, height);
+                              },
+                              readOnly: true,
+                              decoration: InputDecoration(
+                                isDense: true,
+                                filled: true,
+                                hintText: 'Color',
+                                fillColor: categoryColor,
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                              ),
+                            ),
+                            SizedBox(height: 20),
+                            SizedBox(
+                              width: double.infinity,
+                              height: height * 0.05,
+                              child: isLoading == true
+                                  ? Center(
+                                      child: CircularProgressIndicator(),
+                                    )
+                                  : TextButton(
+                                      onPressed: () {
+                                        print(categoryColor);
+                                        // create category object and pop
+                                        Category category = Category(
+                                          categoryId: Uuid().v1(),
+                                          name: categoryNameController.text,
+                                          totalExpenses: 0,
+                                          icon: iconSelected,
+                                          color: categoryColor.toString(),
+                                        );
+                                        context.read<CreateCategoryBloc>().add(
+                                            CreateCategory(category as String));
+                                        Navigator.of(context).pop();
+                                      },
+                                      style: TextButton.styleFrom(
+                                        backgroundColor: Colors.black,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(30),
+                                        ),
+                                      ),
+                                      child: Text(
+                                        'Save',
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 20,
+                                        ),
+                                      ),
+                                    ),
+                            ),
+                          ],
                         ),
                       ),
-                      SizedBox(height: 20),
-                      TextFormField(
-                        controller: categoryIconController,
-                        onTap: () {
-                          setState(() {
-                            isExpanded = !isExpanded;
-                          });
-                        },
-                        readOnly: true,
-                        decoration: InputDecoration(
-                          isDense: true,
-                          filled: true,
-                          hintText: 'Icon',
-                          fillColor: Colors.grey.shade300,
-                          suffixIcon: IconButton(
-                            onPressed: () {},
-                            icon: Icon(
-                              size: 20,
-                              FontAwesomeIcons.caretDown,
-                              color: Colors.black,
-                            ),
-                          ),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.only(
-                              topLeft: Radius.circular(20),
-                              topRight: Radius.circular(20),
-                            ),
-                          ),
-                        ),
-                      ),
-                      isExpanded ? iconContainer(width, setState) : Container(),
-                      SizedBox(height: 20),
-                      TextFormField(
-                        controller: categoryColorController,
-                        onTap: () {
-                          colorPickerDialog(context, height);
-                        },
-                        readOnly: true,
-                        decoration: InputDecoration(
-                          isDense: true,
-                          filled: true,
-                          hintText: 'Color',
-                          fillColor: categoryColor,
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                        ),
-                      ),
-                      SizedBox(height: 20),
-                      SizedBox(
-                        width: double.infinity,
-                        height: height * 0.05,
-                        child: TextButton(
-                          onPressed: () {
-                            print(categoryColor);
-                            // create category object and pop
-                            Category category = Category(
-                              categoryId: Uuid().v1(),
-                              name: categoryNameController.text,
-                              totalExpenses:
-                                  0, // Assuming initial totalExpenses is 0
-                              icon: iconSelected,
-                              color: categoryColor.toString(),
-                            );
-                            context.read<CreateCategoryBloc>().add(
-                                  CreateCategory(category as String),
-                                );
-                            Navigator.of(context).pop();
-                          },
-                          style: TextButton.styleFrom(
-                            backgroundColor: Colors.black,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(30),
-                            ),
-                          ),
-                          child: Text(
-                            'Save',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 20,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
+                    );
+                  },
                 ),
-              );
-            });
+              ),
+            );
           },
         );
       },
