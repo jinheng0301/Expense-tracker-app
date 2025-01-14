@@ -5,7 +5,7 @@ class Category {
   late String name;
   late int totalExpenses;
   late String icon;
-  late String color;
+  late int color;
 
   Category({
     required this.categoryId,
@@ -20,7 +20,7 @@ class Category {
     name: '',
     totalExpenses: 0,
     icon: '',
-    color: '',
+    color: 0,
   );
 
   CategoryEntity toEntity() {

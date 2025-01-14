@@ -4,6 +4,7 @@ import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:track_your_expenses/screens/add_expense/blocs/create_category_bloc/create_category_bloc.dart';
+import 'package:track_your_expenses/screens/add_expense/blocs/get_category_bloc/get_categories_bloc.dart';
 import 'package:track_your_expenses/src/models/categories.dart';
 import 'package:uuid/uuid.dart';
 
@@ -156,7 +157,7 @@ class _AddExpenseState extends State<AddExpense> {
                                           name: categoryNameController.text,
                                           totalExpenses: 0,
                                           icon: iconSelected,
-                                          color: categoryColor.toString(),
+                                          color: categoryColor.value,
                                         );
                                         context.read<CreateCategoryBloc>().add(
                                             CreateCategory(category as String));
@@ -311,115 +312,175 @@ class _AddExpenseState extends State<AddExpense> {
         appBar: AppBar(
           title: Text('Add Expense'),
         ),
-        body: Padding(
-          padding: const EdgeInsets.all(10),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Text(
-                'Add Expense',
-                style: TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-              SizedBox(
-                width: width * 0.8,
-                child: TextFormField(
-                  controller: expenseController,
-                  decoration: InputDecoration(
-                    fillColor: Colors.grey.shade300,
-                    prefixIcon: Icon(
-                      size: 20,
-                      FontAwesomeIcons.dollarSign,
-                      color: Colors.black,
-                    ),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                  ),
-                ),
-              ),
-              SizedBox(height: 20),
-              SizedBox(
-                width: width * 0.8,
-                child: TextFormField(
-                  readOnly: true,
-                  controller: categoryController,
-                  decoration: InputDecoration(
-                    labelText: 'Category',
-                    fillColor: Colors.grey.shade300,
-                    prefixIcon: Icon(
-                      size: 20,
-                      FontAwesomeIcons.list,
-                      color: Colors.black,
-                    ),
-                    suffixIcon: iconCategory(context, width, height),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                  ),
-                ),
-              ),
-              SizedBox(height: 20),
-              SizedBox(
-                width: width * 0.8,
-                child: TextFormField(
-                  controller: dateController,
-                  readOnly: true,
-                  onTap: () async {
-                    DateTime? newDate = await showDatePicker(
-                      context: context,
-                      initialDate: selectDate,
-                      firstDate: DateTime.now(),
-                      lastDate: DateTime.now().add(
-                        Duration(days: 365),
-                      ),
-                    );
+        body: BlocBuilder<GetCategoriesBloc, GetCategoriesState>(
+          builder: (context, state) {
+            state is GetCategoriesSuccess
+                ? Padding(
+                    padding: const EdgeInsets.all(10),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Text(
+                          'Add Expense',
+                          style: TextStyle(
+                            fontSize: 22,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        SizedBox(
+                          width: width * 0.8,
+                          child: TextFormField(
+                            controller: expenseController,
+                            decoration: InputDecoration(
+                              fillColor: Colors.grey.shade300,
+                              prefixIcon: Icon(
+                                size: 20,
+                                FontAwesomeIcons.dollarSign,
+                                color: Colors.black,
+                              ),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                            ),
+                          ),
+                        ),
+                        SizedBox(height: 20),
+                        SizedBox(
+                          width: width * 0.8,
+                          child: TextFormField(
+                            readOnly: true,
+                            controller: categoryController,
+                            decoration: InputDecoration(
+                              labelText: 'Category',
+                              fillColor: Colors.grey.shade300,
+                              prefixIcon: Icon(
+                                size: 20,
+                                FontAwesomeIcons.list,
+                                color: Colors.black,
+                              ),
+                              suffixIcon: iconCategory(context, width, height),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.vertical(
+                                  top: Radius.circular(20),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        Container(
+                          height: 200,
+                          color: Colors.amber,
+                          width: width,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.vertical(
+                              bottom: Radius.circular(20),
+                            ),
+                            color: Colors.white,
+                          ),
+                          child: BlocBuilder<GetCategoriesBloc,
+                              GetCategoriesState>(
+                            builder: (context, state) {
+                              state is GetCategoriesSuccess
+                                  ? ListView.builder(
+                                      itemCount: state.categories.length,
+                                      itemBuilder: (context, index) {
+                                        return Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: Card(
+                                            child: ListTile(
+                                              leading: Image.asset(
+                                                'assets/${state.categories[index].icon}.png',
+                                                scale: 2,
+                                              ),
+                                              title: Text(
+                                                '${state.categories[index].name}',
+                                              ),
+                                              tileColor: Color(
+                                                state.categories[index].color,
+                                              ),
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(10),
+                                              ),
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                    )
+                                  : Center(
+                                      child: CircularProgressIndicator(),
+                                    );
 
-                    if (newDate != null) {
-                      dateController.text =
-                          DateFormat('dd/MM/yyyy').format(newDate);
-                      selectDate = newDate;
-                    }
-                  },
-                  decoration: InputDecoration(
-                    hintText: 'Date',
-                    fillColor: Colors.grey.shade300,
-                    prefixIcon: Icon(
-                      size: 20,
-                      FontAwesomeIcons.timeline,
-                      color: Colors.black,
+                              return Container();
+                            },
+                          ),
+                        ),
+                        SizedBox(height: 20),
+                        SizedBox(
+                          width: width * 0.8,
+                          child: TextFormField(
+                            controller: dateController,
+                            readOnly: true,
+                            onTap: () async {
+                              DateTime? newDate = await showDatePicker(
+                                context: context,
+                                initialDate: selectDate,
+                                firstDate: DateTime.now(),
+                                lastDate: DateTime.now().add(
+                                  Duration(days: 365),
+                                ),
+                              );
+
+                              if (newDate != null) {
+                                dateController.text =
+                                    DateFormat('dd/MM/yyyy').format(newDate);
+                                selectDate = newDate;
+                              }
+                            },
+                            decoration: InputDecoration(
+                              hintText: 'Date',
+                              fillColor: Colors.grey.shade300,
+                              prefixIcon: Icon(
+                                size: 20,
+                                FontAwesomeIcons.timeline,
+                                color: Colors.black,
+                              ),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                            ),
+                          ),
+                        ),
+                        SizedBox(height: 20),
+                        SizedBox(
+                          width: double.infinity,
+                          height: kToolbarHeight,
+                          child: TextButton(
+                            onPressed: () {},
+                            style: TextButton.styleFrom(
+                              backgroundColor: Colors.black,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(30),
+                              ),
+                            ),
+                            child: Text(
+                              'Save',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 20,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                  ),
-                ),
-              ),
-              SizedBox(height: 20),
-              SizedBox(
-                width: double.infinity,
-                height: kToolbarHeight,
-                child: TextButton(
-                  onPressed: () {},
-                  style: TextButton.styleFrom(
-                    backgroundColor: Colors.black,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30),
-                    ),
-                  ),
-                  child: Text(
-                    'Save',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 20,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
+                  )
+                : Center(
+                    child: CircularProgressIndicator(),
+                  );
+
+            return Container();
+          },
         ),
       ),
     );
