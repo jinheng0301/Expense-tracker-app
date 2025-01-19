@@ -2,10 +2,12 @@ import 'dart:math';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:track_your_expenses/data/data.dart';
+import 'package:intl/intl.dart';
+import 'package:track_your_expenses/src/models/expense.dart';
 
 class MainScreen extends StatelessWidget {
-  const MainScreen({super.key});
+  final List<Expense> expenses;
+  MainScreen({required this.expenses});
 
   @override
   Widget build(BuildContext context) {
@@ -55,7 +57,7 @@ class MainScreen extends StatelessWidget {
                         Text(
                           'Jinheng',
                           style: TextStyle(
-                            color: Theme.of(context).colorScheme.onBackground,
+                            color: Theme.of(context).colorScheme.onSurface,
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
                           ),
@@ -90,6 +92,7 @@ class MainScreen extends StatelessWidget {
                 boxShadow: [
                   BoxShadow(
                     blurRadius: 2,
+                    // ignore: deprecated_member_use
                     color: Colors.black.withOpacity(0.2),
                     offset: const Offset(5, 5),
                   ),
@@ -223,7 +226,7 @@ class MainScreen extends StatelessWidget {
                   'Transactions',
                   style: TextStyle(
                     fontSize: 16,
-                    color: Theme.of(context).colorScheme.onBackground,
+                    color: Theme.of(context).colorScheme.onSurface,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -246,7 +249,7 @@ class MainScreen extends StatelessWidget {
             // For the list of transactions
             Expanded(
               child: ListView.builder(
-                itemCount: myTransactionsData.length,
+                itemCount: expenses.length,
                 itemBuilder: (context, index) {
                   return Container(
                     margin: const EdgeInsets.only(bottom: 10),
@@ -268,21 +271,25 @@ class MainScreen extends StatelessWidget {
                                     width: width * 0.15,
                                     height: height * 0.1,
                                     decoration: BoxDecoration(
-                                      color: myTransactionsData[index]['color'],
+                                      color:
+                                          Color(expenses[index].category.color),
                                       shape: BoxShape.circle,
                                     ),
                                   ),
                                 ),
-                                myTransactionsData[index]['icon'],
+                                Image.asset(
+                                  'assets/${expenses[index].category.icon}.png',
+                                  scale: 2,
+                                  color: Colors.white,
+                                ),
                               ],
                             ),
                             const SizedBox(width: 10),
                             Text(
-                              myTransactionsData[index]['name'],
+                              expenses[index].category.name,
                               style: TextStyle(
                                 fontSize: 16,
-                                color:
-                                    Theme.of(context).colorScheme.onBackground,
+                                color: Theme.of(context).colorScheme.onSurface,
                                 fontWeight: FontWeight.w400,
                               ),
                             ),
@@ -294,22 +301,21 @@ class MainScreen extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.end,
                             children: [
                               Text(
-                                myTransactionsData[index]['totalAmount'],
+                                'RM${expenses[index].amount.toString()}.00',
                                 style: TextStyle(
                                   fontSize: 14,
-                                  color: Theme.of(context)
-                                      .colorScheme
-                                      .onBackground,
+                                  color:
+                                      Theme.of(context).colorScheme.onSurface,
                                   fontWeight: FontWeight.w400,
                                 ),
                               ),
                               Text(
-                                myTransactionsData[index]['date'],
+                                DateFormat('dd/MM/yyyy')
+                                    .format(expenses[index].date),
                                 style: TextStyle(
                                   fontSize: 14,
-                                  color: Theme.of(context)
-                                      .colorScheme
-                                      .onBackground,
+                                  color:
+                                      Theme.of(context).colorScheme.onSurface,
                                   fontWeight: FontWeight.w400,
                                 ),
                               ),
